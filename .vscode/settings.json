@@ -1,0 +1,12 @@
+{
+  "solidity.packageDefaultDependenciesContractsDirectory": "",
+  "solidity.packageDefaultDependenciesDirectory": "node_modules",
+  "solidity.enabledAsYouTypeCompilationErrorCheck": true,
+  "solidity.validationDelay": 1500,
+  "solidity.linter": "solium",
+  "solidity.soliumRules": {
+    "quotes": ["error", "double"],
+    "indentation": ["error", 4]
+  },
+  "editor.formatOnSave": true
+}

@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "@nomiclabs/buidler": "^1.2.0",
+    "@openzeppelin/contracts": "^2.5.0",
+    "bignumber.js": "^9.0.0"
+  },
+  "name": "crowdsale",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/nazariyv/crowdsale.git",
+  "author": "Nazariy Vavryk <nazariy@inbox.ru>",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomiclabs/buidler-truffle5": "^1.2.0",
+    "@nomiclabs/buidler-web3": "^1.2.0"
+  }
+}

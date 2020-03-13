@@ -46,3 +46,23 @@ None will be used. Available options are:
 ## Distribution
 
 We release them as participants purchase them. This can be changed, see the section above.
+
+## For devs
+
+Go into root, then
+
+`$yarn install`
+
+to install dependencies, next, you are ready to deploy the contracts. Run
+
+`$yarn buidler run scripts/deploy-token.js`
+
+now that you have deployed the token, you are ready to deploy the Crowdsale smart contract
+
+`$yarn buidler run scripts/deploy-crowdsale.js`
+
+now send some newly minted tokens to the crowdsale contract
+
+`$yarn buidler send-token-to-crowdsale`
+
+congrats! use the crowdsale smart contract address to send it some wei to get back tokens
