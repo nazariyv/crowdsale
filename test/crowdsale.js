@@ -49,10 +49,8 @@ contract("Crowdsale", async accounts => {
       { from: accounts[0] }
     );
 
-    const oneTokenEthPrice = web3.utils.toWei(
-      bignumber(1.0 / RATE).toFixed(),
-      "ether"
-    );
+    const tokenPrice = bignumber(1.0 / RATE);
+    const oneTokenEthPrice = web3.utils.toWei(tokenPrice.toFixed(), "ether");
     const fiveTokenEthPrice = web3.utils.toWei(
       bignumber((1.0 / RATE) * 5).toFixed(),
       "ether"
@@ -62,9 +60,15 @@ contract("Crowdsale", async accounts => {
     const tokenBalanceAcc1 = await mintableToken.balanceOf(accounts[1]);
     assert(tokenBalanceAcc1 / SCALE_FACTOR - 1 < ACCURACY);
 
+    let weiRaised = await crowdsale.weiRaised();
+    assert(weiRaised - parseFloat(oneTokenEthPrice) < ACCURACY);
+
     await crowdsale.send(fiveTokenEthPrice, { from: accounts[2] });
     const tokenBalanceAcc2 = await mintableToken.balanceOf(accounts[2]);
     assert(tokenBalanceAcc2 / SCALE_FACTOR - 5 < ACCURACY);
+
+    weiRaised = await crowdsale.weiRaised();
+    assert(weiRaised - 6 * parseFloat(oneTokenEthPrice) < ACCURACY);
   });
 
   it("correctly uses rate", async () => {});
@@ -74,4 +78,5 @@ contract("Crowdsale", async accounts => {
   // what happens when attempting to buy when no more tokens remain
   // buy tokens with the buyTokens method
   // buy tokens simply by sending the value and thus triggering the fallback
+  // when someone buys tokens, the wallet receives the wei
 });
