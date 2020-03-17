@@ -4,7 +4,13 @@ require("dotenv").config({ path: dotEnvPath });
 
 const MintableToken = artifacts.require("MintableToken");
 const Crowdsale = artifacts.require("Crowdsale");
-const { RATE, INITIAL_SUPPLY, SCALE_FACTOR } = require("../consts.test");
+const {
+  RATE,
+  INITIAL_SUPPLY,
+  SCALE_FACTOR,
+  ACCURACY
+} = require("../consts.test");
+const { toWei } = require("../utils");
 const bignumber = require("bignumber.js");
 
 contract("Crowdsale", async accounts => {
@@ -33,5 +39,40 @@ contract("Crowdsale", async accounts => {
     assert.equal(await rate, RATE);
   });
 
+  it("correctly tracks wei raised", async () => {
+    const tokenBalance = await mintableToken.balanceOf(crowdsale.address);
+    assert(tokenBalance < ACCURACY);
+
+    // top up crowdsale contract with our tokens
+    await mintableToken.transfer(
+      crowdsale.address,
+      bignumber(500 * SCALE_FACTOR).toFixed(),
+      { from: accounts[0] }
+    );
+
+    const oneTokenEthPrice = web3.utils.toWei(
+      bignumber(1.0 / RATE).toFixed(),
+      "ether"
+    );
+    const fiveTokenEthPrice = web3.utils.toWei(
+      bignumber((1.0 / RATE) * 5).toFixed(),
+      "ether"
+    );
+
+    await crowdsale.send(oneTokenEthPrice, { from: accounts[1] });
+    const tokenBalanceAcc1 = await mintableToken.balanceOf(accounts[1]);
+    assert(tokenBalanceAcc1 / SCALE_FACTOR - 1 < ACCURACY);
+
+    await crowdsale.send(fiveTokenEthPrice, { from: accounts[2] });
+    const tokenBalanceAcc2 = await mintableToken.balanceOf(accounts[2]);
+    assert(tokenBalanceAcc2 / SCALE_FACTOR - 5 < ACCURACY);
+  });
+
+  it("correctly uses rate", async () => {});
+
+  it("allows multiple parties to participate", async () => {});
+
   // what happens when attempting to buy when no more tokens remain
+  // buy tokens with the buyTokens method
+  // buy tokens simply by sending the value and thus triggering the fallback
 });
