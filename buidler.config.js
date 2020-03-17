@@ -1,4 +1,5 @@
-usePlugin("@nomiclabs/buidler-truffle5");
+// usePlugin("@nomiclabs/buidler-truffle5");
+// usePlugin("@nomicalbs/buidler-ganache");
 usePlugin("@nomiclabs/buidler-web3");
 
 const bignumber = require("bignumber.js");
@@ -23,7 +24,7 @@ task(
     const accounts = await web3.eth.getAccounts();
 
     const tx = await erc20.methods
-      .transfer(Crowdsale, bignumber(100 * 10 ** 18).toFixed())
+      .transfer(Crowdsale, bignumber(900 * 10 ** 18).toFixed())
       .send({ from: accounts[0] });
 
     console.log("tx", tx);
@@ -31,13 +32,18 @@ task(
 );
 
 module.exports = {
-  defaultNetwork: "mainnet",
+  defaultNetwork: "ganache",
   networks: {
     mainnet: {
       url: "",
       accounts: {
         mnemonic: "eat my pants"
       }
+    },
+    ganache: {
+      url: "http://localhost:8545",
+      gasLimit: 6000000000,
+      defaultBalanceEther: 10
     }
   }
 };
