@@ -10,7 +10,6 @@ const {
   SCALE_FACTOR,
   ACCURACY
 } = require("../consts.test");
-const { toWei } = require("../utils");
 const bignumber = require("bignumber.js");
 
 contract("Crowdsale", async accounts => {
