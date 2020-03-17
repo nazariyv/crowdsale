@@ -12,18 +12,18 @@ const PLACEHOLDER_TKNBITS = 1;
 const OVERFLOW_UINT256 = bignumber("0x" + "f".repeat(64)).toFixed();
 
 contract("MintableToken", async accounts => {
-  it("should deploy", async () => {
+  it("deploys", async () => {
     let instance = await MintableToken.deployed();
     assert.notEqual(instance.address, null);
   });
 
-  it("should deposit initial supply to deployer's contract", async () => {
+  it("deposits initial supply to deployer's contract", async () => {
     let instance = await MintableToken.deployed();
     let tokenBalanceOfDeployer = await instance.balanceOf(accounts[0]);
     assert(tokenBalanceOfDeployer / SCALE_FACTOR - INITIAL_SUPPLY < ACCURACY);
   });
 
-  it("should allow deployer to mint more tokens", async () => {
+  it("allows deployer to mint more tokens", async () => {
     let instance = await MintableToken.deployed();
     let deployerPreBalance = await instance.balanceOf(accounts[0]);
     deployerPreBalance /= SCALE_FACTOR;
@@ -39,7 +39,7 @@ contract("MintableToken", async accounts => {
     );
   });
 
-  it("should disallow non-deployers to mint more tokens", async () => {
+  it("prohibits non-deployers from minting more tokens", async () => {
     let instance = await MintableToken.deployed();
     await accounts.slice(1).forEach(async acc => {
       try {
@@ -55,7 +55,7 @@ contract("MintableToken", async accounts => {
     });
   });
 
-  it("mint is overflow resistant", async () => {
+  it("is mint overflow resistant", async () => {
     let instance = await MintableToken.deployed();
     // uint256 => max number is 2^256 - 1
     // 0xf   = 15   (2^4 - 1)
@@ -71,7 +71,7 @@ contract("MintableToken", async accounts => {
     }
   });
 
-  it("can't mint to zero address", async () => {
+  it("won't mint to zero address", async () => {
     let instance = await MintableToken.deployed();
     try {
       await instance.mint(
@@ -83,7 +83,7 @@ contract("MintableToken", async accounts => {
     }
   });
 
-  it("should disallow non-deployers to transfer tokens", async () => {
+  it("prohibits non-deployers from transfering tokens", async () => {
     // other accs don't have any t0kens
     const instance = await MintableToken.deployed();
 
@@ -98,7 +98,7 @@ contract("MintableToken", async accounts => {
     });
   });
 
-  it("should allow deployer to transfer tokens", async () => {
+  it("allows deployer to transfer tokens", async () => {
     let instance = await MintableToken.deployed();
 
     const senderPreBalance = await instance.balanceOf(accounts[0]);
@@ -117,7 +117,7 @@ contract("MintableToken", async accounts => {
     );
   });
 
-  it("should disallow deployer to transfer tokens to zero address", async () => {
+  it("prohibits deployer from transfering tokens to zero address", async () => {
     let instance = await MintableToken.deployed();
     try {
       await instance.transfer(ZERO_ADDRESS, PLACEHOLDER_TKNBITS);
@@ -126,7 +126,7 @@ contract("MintableToken", async accounts => {
     }
   });
 
-  it("should disallow deployer to transfer more than the balance", async () => {
+  it("prohinits deployer from transfering more than the balance", async () => {
     let instance = await MintableToken.deployed();
     const balance = await instance.balanceOf(accounts[0]);
 
