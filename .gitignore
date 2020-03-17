@@ -1,5 +1,4 @@
-#Buidler files
-cache
-artifacts
+#Truffle files
+build/contracts/
 
 node_modules/

@@ -66,3 +66,12 @@ now send some newly minted tokens to the crowdsale contract
 `$yarn buidler send-token-to-crowdsale`
 
 congrats! use the crowdsale smart contract address to send it some wei to get back tokens
+
+### TODOs
+
+- Make the token mintable
+- Mnemonic of the contract that owns the token and crowdsale into a secret file
+- Add a bunch of tests
+- If time permits, add the front for this project
+- Add live network deployment with truffle
+- Change the readme.md (removed the buidler)

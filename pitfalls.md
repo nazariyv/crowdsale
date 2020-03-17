@@ -31,10 +31,3 @@ Future reading, assembly in Solidity:
 # OpenZeppellin GitHub issues
 
 # OpenZeppellin contract inspection
-
-# TODOs
-
-- Make the token mintable
-- Mnemonic of the contract that owns the token and crowdsale into a secret file
-- Add a bunch of tests
-- If time permits, add the front for this project

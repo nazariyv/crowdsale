@@ -1,7 +1,12 @@
 {
   "dependencies": {
     "@openzeppelin/contracts": "^2.5.0",
-    "bignumber.js": "^9.0.0"
+    "bignumber.js": "^9.0.0",
+    "dotenv": "^8.2.0",
+    "path": "^0.12.7"
+  },
+  "scripts": {
+    "test": "yarn truffle test"
   },
   "name": "crowdsale",
   "version": "1.0.0",
@@ -9,5 +14,7 @@
   "repository": "https://github.com/nazariyv/crowdsale.git",
   "author": "Nazariy Vavryk <nazariy@inbox.ru>",
   "license": "MIT",
-  "devDependencies": {}
+  "devDependencies": {
+    "truffle": "^5.1.17"
+  }
 }
