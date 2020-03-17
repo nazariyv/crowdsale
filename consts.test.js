@@ -9,6 +9,7 @@ const ZERO_ADDRESS = process.env.ZERO_ADDRESS;
 const ACCURACY = 10 ** -4;
 const PLACEHOLDER_TKNBITS = 1;
 const OVERFLOW_UINT256 = bignumber("0x" + "f".repeat(64)).toFixed();
+const RATE = parseFloat(process.env.RATE);
 
 module.exports = {
   INITIAL_SUPPLY,
@@ -16,5 +17,6 @@ module.exports = {
   ZERO_ADDRESS,
   ACCURACY,
   PLACEHOLDER_TKNBITS,
-  OVERFLOW_UINT256
+  OVERFLOW_UINT256,
+  RATE
 };

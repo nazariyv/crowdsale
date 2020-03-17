@@ -75,3 +75,4 @@ congrats! use the crowdsale smart contract address to send it some wei to get ba
 - If time permits, add the front for this project
 - Add live network deployment with truffle
 - Change the readme.md (removed the buidler)
+- website that tracks the stats of the crowdsale + who bought how much

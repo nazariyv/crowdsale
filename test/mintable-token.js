@@ -14,27 +14,33 @@ const {
 } = require("../consts.test");
 
 contract("MintableToken", async accounts => {
+  beforeEach(async () => {
+    mintableToken = await MintableToken.new(
+      bignumber(INITIAL_SUPPLY * SCALE_FACTOR).toFixed()
+    );
+  });
+
   it("deploys", async () => {
-    let instance = await MintableToken.deployed();
-    assert.notEqual(instance.address, null);
+    assert.notEqual(mintableToken.address, null);
   });
 
   it("deposits initial supply to deployer's contract", async () => {
-    let instance = await MintableToken.deployed();
-    let tokenBalanceOfDeployer = await instance.balanceOf(accounts[0]);
+    let tokenBalanceOfDeployer = await mintableToken.balanceOf(accounts[0]);
     assert(tokenBalanceOfDeployer / SCALE_FACTOR - INITIAL_SUPPLY < ACCURACY);
   });
 
   it("allows deployer to mint more tokens", async () => {
-    let instance = await MintableToken.deployed();
-    let deployerPreBalance = await instance.balanceOf(accounts[0]);
+    let deployerPreBalance = await mintableToken.balanceOf(accounts[0]);
     deployerPreBalance /= SCALE_FACTOR;
     assert(deployerPreBalance - INITIAL_SUPPLY < ACCURACY);
 
     const additionalSupply = 20000 * SCALE_FACTOR;
-    await instance.mint(accounts[0], bignumber(additionalSupply).toFixed());
+    await mintableToken.mint(
+      accounts[0],
+      bignumber(additionalSupply).toFixed()
+    );
 
-    const postMintBalance = await instance.balanceOf(accounts[0]);
+    const postMintBalance = await mintableToken.balanceOf(accounts[0]);
     assert(
       postMintBalance - (deployerPreBalance * SCALE_FACTOR + additionalSupply) <
         ACCURACY
@@ -42,12 +48,15 @@ contract("MintableToken", async accounts => {
   });
 
   it("prohibits non-deployers from minting more tokens", async () => {
-    let instance = await MintableToken.deployed();
     await accounts.slice(1).forEach(async acc => {
       try {
-        await instance.mint(acc, bignumber(10000 * SCALE_FACTOR).toFixed(), {
-          from: acc
-        });
+        await mintableToken.mint(
+          acc,
+          bignumber(10000 * SCALE_FACTOR).toFixed(),
+          {
+            from: acc
+          }
+        );
       } catch (err) {
         assert.equal(
           err.reason,
@@ -58,7 +67,6 @@ contract("MintableToken", async accounts => {
   });
 
   it("is mint overflow resistant", async () => {
-    let instance = await MintableToken.deployed();
     // uint256 => max number is 2^256 - 1
     // 0xf   = 15   (2^4 - 1)
     // 0xff  = 255  (2^4 * 2^4 - 1) or (2^8 - 1)
@@ -67,16 +75,15 @@ contract("MintableToken", async accounts => {
     // 1 hex value representes 16 bits or 2 bytes
     // "0x" + "f...256/4 times...f" will overflow
     try {
-      await instance.mint(accounts[0], OVERFLOW_UINT256);
+      await mintableToken.mint(accounts[0], OVERFLOW_UINT256);
     } catch (err) {
       assert.equal(err.reason, "SafeMath: addition overflow");
     }
   });
 
   it("won't mint to zero address", async () => {
-    let instance = await MintableToken.deployed();
     try {
-      await instance.mint(
+      await mintableToken.mint(
         ZERO_ADDRESS,
         bignumber(10000 * SCALE_FACTOR).toFixed()
       );
@@ -87,11 +94,9 @@ contract("MintableToken", async accounts => {
 
   it("prohibits non-deployers from transfering tokens", async () => {
     // other accs don't have any t0kens
-    const instance = await MintableToken.deployed();
-
     await accounts.slice(1).forEach(async acc => {
       try {
-        await instance.transfer(accounts[0], PLACEHOLDER_TKNBITS, {
+        await mintableToken.transfer(accounts[0], PLACEHOLDER_TKNBITS, {
           from: acc
         });
       } catch (err) {
@@ -101,15 +106,13 @@ contract("MintableToken", async accounts => {
   });
 
   it("allows deployer to transfer tokens", async () => {
-    let instance = await MintableToken.deployed();
+    const senderPreBalance = await mintableToken.balanceOf(accounts[0]);
+    const receiverPreBalance = await mintableToken.balanceOf(accounts[1]);
 
-    const senderPreBalance = await instance.balanceOf(accounts[0]);
-    const receiverPreBalance = await instance.balanceOf(accounts[1]);
+    await mintableToken.transfer(accounts[1], PLACEHOLDER_TKNBITS);
 
-    await instance.transfer(accounts[1], PLACEHOLDER_TKNBITS);
-
-    const senderPostBalanace = await instance.balanceOf(accounts[0]);
-    const receiverPostBalance = await instance.balanceOf(accounts[1]);
+    const senderPostBalanace = await mintableToken.balanceOf(accounts[0]);
+    const receiverPostBalance = await mintableToken.balanceOf(accounts[1]);
 
     assert(
       senderPreBalance - senderPostBalanace < PLACEHOLDER_TKNBITS + ACCURACY
@@ -120,20 +123,18 @@ contract("MintableToken", async accounts => {
   });
 
   it("prohibits deployer from transfering tokens to zero address", async () => {
-    let instance = await MintableToken.deployed();
     try {
-      await instance.transfer(ZERO_ADDRESS, PLACEHOLDER_TKNBITS);
+      await mintableToken.transfer(ZERO_ADDRESS, PLACEHOLDER_TKNBITS);
     } catch (err) {
       assert.equal(err.reason, "ERC20: transfer to the zero address");
     }
   });
 
   it("prohinits deployer from transfering more than the balance", async () => {
-    let instance = await MintableToken.deployed();
-    const balance = await instance.balanceOf(accounts[0]);
+    const balance = await mintableToken.balanceOf(accounts[0]);
 
     try {
-      await instance.transfer(accounts[1], balance + PLACEHOLDER_TKNBITS);
+      await mintableToken.transfer(accounts[1], balance + PLACEHOLDER_TKNBITS);
     } catch (err) {
       assert.equal(err.reason, "ERC20: transfer amount exceeds balance");
     }
