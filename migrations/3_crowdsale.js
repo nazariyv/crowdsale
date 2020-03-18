@@ -5,8 +5,11 @@ const loadEnv = require("../utils");
 
 const deploy = async (deployer, network, accounts) => {
   const { RATE } = loadEnv(network);
+  const developNetwork = network !== "live" && network !== "live-fork";
+  let migrations = "";
 
-  const migrations = await Migrations.deployed();
+  if (developNetwork) migrations = await Migrations.deployed();
+
   const mintableToken = await MintableToken.deployed();
 
   const crowdsale = await deployer.deploy(
@@ -16,9 +19,8 @@ const deploy = async (deployer, network, accounts) => {
     mintableToken.address
   );
 
-  if (network !== "live" && network !== "live-fork") {
+  if (developNetwork)
     console.log("migrations contract deployed at:", migrations.address);
-  }
   console.log("mintable token contract deployed at:", mintableToken.address);
   console.log("crowdsale token contract deployed at:", crowdsale.address);
   console.log(
