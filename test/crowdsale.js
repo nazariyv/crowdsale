@@ -11,6 +11,7 @@ const {
   ACCURACY
 } = require("../consts.test");
 const bignumber = require("bignumber.js");
+const CROWDSALE_TOKENS = 500.0;
 
 contract("Crowdsale", async accounts => {
   beforeEach(async () => {
@@ -18,6 +19,13 @@ contract("Crowdsale", async accounts => {
       bignumber(INITIAL_SUPPLY * SCALE_FACTOR).toFixed()
     );
     crowdsale = await Crowdsale.new(RATE, accounts[0], mintableToken.address);
+    tokenPrice = bignumber(1.0 / RATE);
+
+    // top up crowdsale contract with our tokens, so that it can distribute these to buyers
+    await mintableToken.transfer(
+      crowdsale.address,
+      bignumber(CROWDSALE_TOKENS * SCALE_FACTOR).toFixed()
+    );
   });
 
   it("deploys", async () => {
@@ -38,45 +46,88 @@ contract("Crowdsale", async accounts => {
     assert.equal(await rate, RATE);
   });
 
-  it("correctly tracks wei raised", async () => {
-    const tokenBalance = await mintableToken.balanceOf(crowdsale.address);
-    assert(tokenBalance < ACCURACY);
+  it("correctly uses rate to distribute tokens", async () => {
+    const tknPriceInEth = tokenPrice;
+    const tknPriceInWei = web3.utils.toWei(tknPriceInEth.toFixed(), "ether");
 
-    // top up crowdsale contract with our tokens
-    await mintableToken.transfer(
-      crowdsale.address,
-      bignumber(500 * SCALE_FACTOR).toFixed(),
-      { from: accounts[0] }
+    const tokenBalancePre = await mintableToken.balanceOf(accounts[0]);
+    await crowdsale.send(tknPriceInWei);
+    const tokenBalancePost = await mintableToken.balanceOf(accounts[0]);
+
+    assert((tokenBalancePost - tokenBalancePre) / SCALE_FACTOR < 1 + ACCURACY);
+  });
+
+  it("sends correct number of tokens for non-whole numbers", async () => {
+    const tknPriceInEth = tokenPrice;
+    const tknPriceInWei = parseFloat(
+      web3.utils.toWei(tknPriceInEth.toFixed(), "ether")
     );
 
-    const tokenPrice = bignumber(1.0 / RATE);
-    const oneTokenEthPrice = web3.utils.toWei(tokenPrice.toFixed(), "ether");
-    const fiveTokenEthPrice = web3.utils.toWei(
-      bignumber((1.0 / RATE) * 5).toFixed(),
+    const tknsToReceive = 1.23456789;
+    const tknsPrice = String(Math.round(tknsToReceive * tknPriceInWei));
+
+    await crowdsale.send(tknsPrice, { from: accounts[1] });
+    const tokenBalance = await mintableToken.balanceOf(accounts[1]);
+
+    assert(tokenBalance - tknsToReceive * SCALE_FACTOR < ACCURACY);
+  });
+
+  it("correctly tracks wei raised", async () => {
+    // also tests that multiple parties can participate
+    let oneTokenWeiPrice = web3.utils.toWei(tokenPrice.toFixed(), "ether");
+    const fiveTokensWeiPrice = web3.utils.toWei(
+      String(5.0 * tokenPrice),
       "ether"
     );
 
-    await crowdsale.send(oneTokenEthPrice, { from: accounts[1] });
+    await crowdsale.send(oneTokenWeiPrice, { from: accounts[1] });
     const tokenBalanceAcc1 = await mintableToken.balanceOf(accounts[1]);
-    assert(tokenBalanceAcc1 / SCALE_FACTOR - 1 < ACCURACY);
+    assert(tokenBalanceAcc1 / SCALE_FACTOR < 1 + ACCURACY);
 
+    oneTokenWeiPrice = parseFloat(oneTokenWeiPrice);
     let weiRaised = await crowdsale.weiRaised();
-    assert(weiRaised - parseFloat(oneTokenEthPrice) < ACCURACY);
+    assert(weiRaised - oneTokenWeiPrice < ACCURACY);
 
-    await crowdsale.send(fiveTokenEthPrice, { from: accounts[2] });
+    await crowdsale.send(fiveTokensWeiPrice, { from: accounts[2] });
     const tokenBalanceAcc2 = await mintableToken.balanceOf(accounts[2]);
-    assert(tokenBalanceAcc2 / SCALE_FACTOR - 5 < ACCURACY);
+    assert(tokenBalanceAcc2 / SCALE_FACTOR < 5 + ACCURACY);
 
     weiRaised = await crowdsale.weiRaised();
-    assert(weiRaised - 6 * parseFloat(oneTokenEthPrice) < ACCURACY);
+    assert(weiRaised - 6 * oneTokenWeiPrice < ACCURACY);
   });
 
-  it("correctly uses rate", async () => {});
+  it("buying when no more tokens are available", async () => {
+    const tknPriceInWei = parseFloat(
+      web3.utils.toWei(tokenPrice.toFixed(), "ether")
+    );
+    let overflowTokensPrice = String(
+      Math.round((CROWDSALE_TOKENS + 1) * tknPriceInWei)
+    );
 
-  it("allows multiple parties to participate", async () => {});
+    try {
+      // this call should fail because the crowdsale smart contract does not have enough tokens
+      // to send, and so the transaction will be reverted
+      await crowdsale.send(overflowTokensPrice, { from: accounts[1] });
+    } catch (err) {
+      assert.equal(err.reason, "SafeERC20: low-level call failed");
+    }
+  });
 
-  // what happens when attempting to buy when no more tokens remain
-  // buy tokens with the buyTokens method
-  // buy tokens simply by sending the value and thus triggering the fallback
-  // when someone buys tokens, the wallet receives the wei
+  it("sends the wei raised to wallet", async () => {
+    const tknPriceInWei = web3.utils.toWei(tokenPrice.toFixed(), "ether");
+
+    const walletWeiBalancePre = await web3.eth.getBalance(accounts[0]);
+
+    await crowdsale.send(tknPriceInWei, { from: accounts[1] });
+    await crowdsale.send(String(5.0 * parseFloat(tknPriceInWei)), {
+      from: accounts[1]
+    });
+
+    const walletWeiBalancePost = await web3.eth.getBalance(accounts[0]);
+
+    assert(
+      walletWeiBalancePost - walletWeiBalancePre <
+        bignumber(web3.utils.toWei("0.0006", "ether")) + bignumber(ACCURACY)
+    );
+  });
 });
