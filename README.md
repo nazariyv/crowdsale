@@ -2,9 +2,13 @@
 
 Ethereum ERC20 crowdsale
 
-# High level
+# Investor Workflow
 
-Investor sends ether to an address (**FROM OWN ETHEREUM WALLET**, e.g. MetaMask **DO NOT USE EXCHANGE WALLET**) and immediately gets back tokens
+Investor sends ether to an address (**FROM OWN ETHEREUM WALLET**, e.g. MetaMask; **DO NOT USE EXCHANGE WALLET**) and immediately gets back tokens
+
+To check that you have received the tokens, either inspect the resulting transaction, or use Zerion.io (in the screenshot below we have ETH and MNT token)
+
+![zerion](static/img/zerion-io-mintable.png)
 
 # Technicals
 
