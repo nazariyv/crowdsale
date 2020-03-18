@@ -4,7 +4,7 @@ Ethereum ERC20 crowdsale
 
 # High level
 
-Investor sends ether to an address and immediately gets back tokens
+Investor sends ether to an address (**FROM OWN ETHEREUM WALLET**, e.g. MetaMask **DO NOT USE EXCHANGE WALLET**) and immediately gets back tokens
 
 # Technicals
 
@@ -69,11 +69,6 @@ congrats! use the crowdsale smart contract address to send it some wei to get ba
 
 ### TODOs
 
-- Make the token mintable
-- Mnemonic of the contract that owns the token and crowdsale into a secret file
-- Add a bunch of tests
-- If time permits, add the front for this project
-- Add live network deployment with truffle
 - Change the readme.md (removed the buidler)
 - website that tracks the stats of the crowdsale + who bought how much
 - add typescript. the types here are crazy
