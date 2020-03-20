@@ -8,6 +8,7 @@ const SCALE_FACTOR = parseFloat(process.env.SCALE_FACTOR);
 const ZERO_ADDRESS = process.env.ZERO_ADDRESS;
 const ACCURACY = 10 ** -4;
 const PLACEHOLDER_TKNBITS = 1;
+// nibble (hex digit) is 4 bits (0 to 15 in decimal) so 256 bits is 64 nibbles. a nibble is half a byte
 const OVERFLOW_UINT256 = bignumber("0x" + "f".repeat(64)).toFixed();
 const RATE = parseFloat(process.env.RATE);
 
