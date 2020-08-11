@@ -3,24 +3,27 @@
     "@openzeppelin/contracts": "^2.5.0",
     "bignumber.js": "^9.0.0",
     "dotenv": "^8.2.0",
+    "elliptic": "^6.5.3",
+    "lodash": "^4.17.19",
     "path": "^0.12.7",
     "web3": "^1.2.6"
+  },
+  "devDependencies": {
+    "@truffle/hdwallet-provider": "^1.0.33",
+    "node-gyp": "7.0.0",
+    "truffle": "^5.1.17"
   },
   "scripts": {
     "test": "yarn truffle test"
   },
   "engines": {
-    "node": "11.15.0",
-    "yarn": "1.22.0"
+    "node": "12.18.3",
+    "yarn": "1.22.4"
   },
   "name": "crowdsale",
   "version": "1.0.0",
   "main": "index.js",
   "repository": "https://github.com/nazariyv/crowdsale.git",
   "author": "Nazariy Vavryk <nazariy@inbox.ru>",
-  "license": "MIT",
-  "devDependencies": {
-    "@truffle/hdwallet-provider": "^1.0.33",
-    "truffle": "^5.1.17"
-  }
+  "license": "MIT"
 }
